@@ -77,8 +77,14 @@ class MockStockSource implements StockSource {
   @override
   Future<DailyPricePage> fetchDailyPage(String symbol, int page) async {
     final String path = '$_base/sise_day_${symbol}_p$page.html';
-    final String text = await rootBundle.loadString(path);
-    return parseDailyPage(text, page);
+    try {
+      final String text = await rootBundle.loadString(path);
+      return parseDailyPage(text, page);
+    } catch (_) {
+      // mock 에 없는 페이지는 lastPage 를 방금 요청한 페이지로 잡아
+      // 상세 화면이 이 시점부터 더 요청을 안 걸도록 유도.
+      return DailyPricePage(page: page, prices: const <DailyPrice>[], lastPage: page - 1);
+    }
   }
 }
 
