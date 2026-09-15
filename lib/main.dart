@@ -22,6 +22,7 @@ class EdencrewAssignmentApp extends StatelessWidget {
 
     return MultiProvider(
       providers: [
+        Provider<StockSource>.value(value: source),
         ChangeNotifierProvider<WatchlistStore>(
           create: (_) => WatchlistStore(source: source),
         ),

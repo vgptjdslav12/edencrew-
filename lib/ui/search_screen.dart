@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../data/models.dart';
+import '../data/stock_source.dart';
 import '../state/search_store.dart';
 import '../state/watchlist_store.dart';
 import '../theme/theme.dart';
+import 'detail_screen.dart';
 import 'widgets/empty_state.dart';
 import 'widgets/favorite_toast.dart';
 import 'widgets/search_row.dart';
@@ -194,11 +196,18 @@ class _SearchBody extends StatelessWidget {
             toast.show(FavoriteToast(registered: nowFav));
           },
           onTap: () {
-            // 상세 화면은 아직 미구현 (3일차). 우선 스낵바로 이동 예정임을 알려둔다.
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('${hit.name} 상세 (3일차)'),
-                duration: const Duration(milliseconds: 900),
+            final StockSource source = context.read<StockSource>();
+            Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => DetailScreen(
+                  symbol: hit.symbol,
+                  source: source,
+                  preloadedMeta: StockMeta(
+                    symbol: hit.symbol,
+                    name: hit.name,
+                    marketKor: hit.market,
+                  ),
+                ),
               ),
             );
           },

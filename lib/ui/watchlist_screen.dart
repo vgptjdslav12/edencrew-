@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../data/stock_source.dart';
 import '../state/watchlist_store.dart';
 import '../theme/theme.dart';
+import 'detail_screen.dart';
 import 'widgets/empty_state.dart';
 import 'widgets/sort_sheet.dart';
 import 'widgets/watchlist_row.dart';
@@ -55,6 +57,19 @@ class WatchlistScreen extends StatelessWidget {
                       symbol: s,
                       meta: store.metaOf(s),
                       quote: store.quoteOf(s),
+                      onTap: () {
+                        final StockSource source = context.read<StockSource>();
+                        Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                            builder: (_) => DetailScreen(
+                              symbol: s,
+                              source: source,
+                              preloadedMeta: store.metaOf(s),
+                              preloadedQuote: store.quoteOf(s),
+                            ),
+                          ),
+                        );
+                      },
                     );
                   },
                 ),
