@@ -36,6 +36,7 @@ class BottomTabBar extends StatelessWidget {
         children: <Widget>[
           _TabItem(
             icon: Icons.star_outline,
+            activeIcon: Icons.star,
             label: '관심',
             selected: current == HomeTab.watchlist,
             onTap: () => onSelect(HomeTab.watchlist),
@@ -55,12 +56,14 @@ class BottomTabBar extends StatelessWidget {
 class _TabItem extends StatelessWidget {
   const _TabItem({
     required this.icon,
+    this.activeIcon,
     required this.label,
     required this.selected,
     required this.onTap,
   });
 
   final IconData icon;
+  final IconData? activeIcon;
   final String label;
   final bool selected;
   final VoidCallback onTap;
@@ -75,7 +78,7 @@ class _TabItem extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Icon(icon, color: c, size: context.dimens.iconMd),
+            Icon(selected ? (activeIcon ?? icon) : icon, color: c, size: context.dimens.iconMd),
             SizedBox(height: context.dimens.space1),
             Text(
               label,
