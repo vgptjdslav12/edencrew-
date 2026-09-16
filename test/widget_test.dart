@@ -7,8 +7,8 @@ void main() {
     await tester.pumpWidget(const EdencrewAssignmentApp());
     await tester.pumpAndSettle();
 
-    // 상단 헤더
-    expect(find.text('관심'), findsOneWidget);
+    // 헤더 + 하단 탭 라벨 두 곳에서 노출
+    expect(find.text('관심'), findsNWidgets(2));
     // 빈 상태 문구
     expect(find.text('관심 종목이 없습니다'), findsOneWidget);
     // 하단 탭 바
