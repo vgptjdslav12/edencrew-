@@ -16,9 +16,8 @@ class EdencrewAssignmentApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 개발/제출 시엔 assets/mock 을 그대로 쓴다. 실제 네트워크로 붙이려면
-    // 여기 한 줄만 `NaverStockSource()` 로 바꿔주면 된다.
-    final StockSource source = const MockStockSource();
+    // 실제 Naver endpoint 로 붙는다. 네트워크 없이 띄우려면 `MockStockSource()` 로.
+    final StockSource source = NaverStockSource();
 
     return MultiProvider(
       providers: [
