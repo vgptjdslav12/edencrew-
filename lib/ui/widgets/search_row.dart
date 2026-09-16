@@ -5,10 +5,7 @@ import '../../theme/theme.dart';
 import '../format.dart';
 import 'highlighted_text.dart';
 
-/// 검색 결과 한 행.
-///
-/// 종목명 안에서 [query] 와 일치하는 부분이 하이라이트된다.
-/// 우측 별 아이콘은 [isFavorite] 상태에 따라 색이 다르고, 탭 시 [onToggle] 이 불린다.
+// 검색 결과 한 행. 이름에 query 하이라이트 + 우측 별 토글.
 class SearchRow extends StatelessWidget {
   const SearchRow({
     super.key,

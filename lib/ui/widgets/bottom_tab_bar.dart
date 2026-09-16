@@ -4,7 +4,7 @@ import '../../theme/theme.dart';
 
 enum HomeTab { watchlist, search }
 
-/// 관심 / 검색 두 개짜리 하단 탭 바.
+// 관심/검색 두 개짜리 하단 탭.
 class BottomTabBar extends StatelessWidget {
   const BottomTabBar({
     super.key,

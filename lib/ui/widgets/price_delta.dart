@@ -4,9 +4,7 @@ import '../../data/models.dart';
 import '../../theme/theme.dart';
 import '../format.dart';
 
-/// 등락액/등락률 텍스트. 방향에 따라 색이 바뀐다.
-///
-/// 예: `-400 (-0.22%)`
+// 등락액/등락률 텍스트. 예: -400 (-0.22%).
 class PriceDeltaText extends StatelessWidget {
   const PriceDeltaText({
     super.key,

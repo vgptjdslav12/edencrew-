@@ -4,9 +4,7 @@ import '../../data/models.dart';
 import '../../theme/theme.dart';
 import '../format.dart';
 
-/// 시가 / 고가 / 저가 / 거래량 / 시가총액 요약 카드.
-///
-/// 시세를 아직 못 받은 경우엔 자리만 잡고 값은 `-` 로.
+// 시가 / 고가 / 저가 / 거래량 / 시가총액 요약. quote 없으면 자리만 잡고 - 표시.
 class SummaryCard extends StatelessWidget {
   const SummaryCard({super.key, required this.quote});
 

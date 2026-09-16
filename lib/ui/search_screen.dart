@@ -11,7 +11,7 @@ import 'widgets/empty_state.dart';
 import 'widgets/favorite_toast.dart';
 import 'widgets/search_row.dart';
 
-/// 검색 화면 (`02 · 검색`).
+// 검색 화면 (02 · 검색).
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key, required this.toast});
 
@@ -153,8 +153,7 @@ class _SearchBody extends StatelessWidget {
     }
 
     if (search.results.isEmpty) {
-      // 검색어가 매우 길 때 그대로 노출하면 안내 문구가 두 줄을 넘어갈 수 있어
-      // 24자에서 잘라 `...` 를 붙였다. (직접 판단 사항 · README 기록)
+      // 아주 긴 검색어면 문구가 두 줄 넘어감. 24자에서 자르고 … 붙임 (README).
       final String shown = search.query.length > 24
           ? '${search.query.substring(0, 24)}…'
           : search.query;

@@ -2,10 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../theme/theme.dart';
 
-/// `text` 안에서 `query` 와 일치하는 구간에 `searchHighlight` 색을 입힌다.
-///
-/// - 대소문자 구분 없이 매칭.
-/// - `query` 가 빈 문자열이면 원문 그대로 출력.
+// text 에서 query 매칭 구간에 searchHighlight 색. 대소문자 무시, 빈 query 면 원문.
 class HighlightedText extends StatelessWidget {
   const HighlightedText({
     super.key,

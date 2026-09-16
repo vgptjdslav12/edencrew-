@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../theme/theme.dart';
 
-/// 아이콘 + 제목 + 안내 문구로 구성된 빈 상태 표시.
-///
-/// 관심 화면 · 검색 화면(입력 전 / 결과 없음)에서 재사용한다.
+// 관심/검색 두 화면 공용 빈 상태.
 class EmptyState extends StatelessWidget {
   const EmptyState({
     super.key,

@@ -6,10 +6,7 @@ import '../format.dart';
 import 'price_delta.dart';
 import 'skeleton.dart';
 
-/// 관심 화면 목록 한 행.
-///
-/// [meta] 가 없으면 이름/시장이 스켈레톤이 되고, [quote] 가 없으면 가격/등락이
-/// 스켈레톤이 된다. 이 두 상태가 따로 채워지는 걸 그대로 반영한다.
+// 관심 화면 한 행. meta/quote 가 각각 없으면 그 부분만 스켈레톤.
 class WatchlistRow extends StatelessWidget {
   const WatchlistRow({
     super.key,

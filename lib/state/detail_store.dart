@@ -3,7 +3,6 @@ import 'package:flutter/foundation.dart';
 import '../data/models.dart';
 import '../data/stock_source.dart';
 
-/// 상세 화면의 기간 탭.
 enum DetailPeriod { month1, month3, month6, year1 }
 
 extension DetailPeriodLabel on DetailPeriod {
@@ -20,7 +19,7 @@ extension DetailPeriodLabel on DetailPeriod {
     }
   }
 
-  /// 이 기간을 채우는 데 필요한 페이지 수. (한 페이지 = 10 거래일)
+  // 1 페이지 = 10 거래일 기준.
   int get pageCount {
     switch (this) {
       case DetailPeriod.month1:
@@ -35,11 +34,8 @@ extension DetailPeriodLabel on DetailPeriod {
   }
 }
 
-/// 상세 화면 한 화면분의 상태.
-///
-/// - 종목 메타/시세 로드 (관심 스토어에서 아직 못 받아온 경우 대비)
-/// - 기간 탭 전환 처리
-/// - 일별 시세 페이지 캐싱 + 필요한 만큼만 이어받기
+// 상세 한 화면 분량의 상태.
+// 메타/시세 fallback 로드 + 기간 탭 전환 + 일별 페이지 캐싱/이어받기.
 class DetailStore extends ChangeNotifier {
   DetailStore({required this.symbol, required StockSource source})
       : _source = source;
@@ -59,10 +55,7 @@ class DetailStore extends ChangeNotifier {
   DetailPeriod get period => _period;
   bool get loading => _loading;
 
-  /// 현재 기간에 해당하는 일별 시세를 최신 → 과거 순으로 이어붙여 반환.
-  ///
-  /// 페이지에 구멍이 있으면 그 시점까지만 채워서 반환한다. (스크롤/차트가
-  /// 부분적으로라도 뜨는 편이 자연스러움.)
+  // 현재 기간 일별 시세 (최신→과거). 페이지에 구멍 있으면 거기까지만.
   List<DailyPrice> get dailyPrices {
     final int need = _period.pageCount;
     final List<DailyPrice> out = <DailyPrice>[];
@@ -74,7 +67,6 @@ class DetailStore extends ChangeNotifier {
     return out;
   }
 
-  /// 기간 요구치 대비 페이지 로드가 다 끝났는지.
   bool get isPeriodFullyLoaded {
     final int need = _period.pageCount;
     final int last = _knownLastPage ?? need;
@@ -122,17 +114,15 @@ class DetailStore extends ChangeNotifier {
     await _loadForPeriod();
   }
 
-  /// 현재 [_period] 를 채우는 데 필요한 페이지들을 병렬로 받는다.
-  ///
-  /// 이미 캐시에 있는 페이지는 재요청하지 않는다.
-  /// page 1 응답에서 [_knownLastPage] 를 얻으면 그 이상은 요청하지 않는다.
+  // 현재 _period 를 채울 페이지들 병렬 로드.
+  // 캐시된 페이지는 skip. page 1 응답의 lastPage 로 상한 잡음.
   Future<void> _loadForPeriod() async {
     if (_loading) return;
     _loading = true;
     notifyListeners();
 
     try {
-      // page 1 은 lastPage 를 알아낼 유일한 근거라 먼저 보장.
+      // page 1 이 lastPage 알아낼 유일한 소스라 먼저.
       if (_pages[1] == null) {
         try {
           final DailyPricePage first =
@@ -141,7 +131,7 @@ class DetailStore extends ChangeNotifier {
           _knownLastPage = first.lastPage;
           notifyListeners();
         } catch (_) {
-          // page 1 실패면 나머지도 못 받음. 조용히 종료.
+          // 실패하면 나머지도 의미 없음. 종료.
           return;
         }
       } else {
@@ -168,7 +158,7 @@ class DetailStore extends ChangeNotifier {
     try {
       final DailyPricePage p = await _source.fetchDailyPage(symbol, page);
       _pages[page] = p;
-      // 처음 마주친 lastPage 정보가 있으면 갱신.
+      // lastPage 아직 못 잡았으면 여기서 갱신.
       if (_knownLastPage == null && p.lastPage != null) {
         _knownLastPage = p.lastPage;
       }

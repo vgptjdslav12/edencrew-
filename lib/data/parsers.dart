@@ -2,12 +2,7 @@ import 'dart:convert';
 
 import 'models.dart';
 
-/// Naver 자동완성 응답 JSON 을 `SearchHit` 목록으로 변환.
-///
-/// 다음 조건을 통과한 항목만 남긴다.
-/// - `category == 'stock'`
-/// - `nationCode == 'KOR'` (국내 주식)
-/// - `code` 가 정확히 숫자 6자리 (우선주, 리츠 포함)
+// 자동완성 응답 → SearchHit. category=stock, nationCode=KOR, code 6자리만 남김.
 List<SearchHit> parseAutocomplete(String jsonText) {
   final dynamic decoded = json.decode(jsonText);
   if (decoded is! Map || decoded['items'] is! List) {
@@ -40,9 +35,7 @@ List<SearchHit> parseAutocomplete(String jsonText) {
   return out;
 }
 
-/// Naver 실시간 시세 응답 JSON 을 symbol → Quote 맵으로 변환.
-///
-/// 여러 심볼을 한 번의 요청으로 조회한 응답을 그대로 넘기면 된다.
+// 실시간 시세 응답 → symbol별 Quote 맵.
 Map<String, Quote> parseRealtime(String jsonText) {
   final dynamic decoded = json.decode(jsonText);
   if (decoded is! Map) return const <String, Quote>{};
@@ -83,7 +76,7 @@ Map<String, Quote> parseRealtime(String jsonText) {
   return out;
 }
 
-/// 종목 메타데이터 응답 JSON 을 `StockMeta` 로 변환.
+// 메타 응답 → StockMeta.
 StockMeta parseMeta(String jsonText) {
   final dynamic decoded = json.decode(jsonText);
   if (decoded is! Map) {
@@ -105,21 +98,12 @@ num? _num(dynamic v) {
   return null;
 }
 
-/// 일별 시세 HTML 파서.
-///
-/// finance.naver.com/item/sise_day.naver 응답을 파싱해 [DailyPricePage] 를 만든다.
-///
-/// - 표의 각 행에서 날짜, 종가, 시가, 고가, 저가, 거래량을 뽑는다.
-/// - 상단 헤더 행이나 빈 tr, colspan 만 있는 tr 은 건너뛴다.
-/// - 하단 페이지 네비게이션의 `맨뒤` 링크에서 마지막 페이지 번호를 뽑는다.
-///   (해당 링크가 없다면 = 이미 마지막 페이지에 도달한 경우)
-///
-/// 이 파일은 `html` 패키지 없이 정규식만 사용한다. HTML 구조가 매우 단순하고
-/// 오랫동안 유지된 형태라 정규식 파싱으로 충분하다고 판단.
+// 일별 시세 HTML → DailyPricePage.
+// 구조가 오래된 정적 테이블이라 html 패키지 없이 정규식으로 충분함.
+// 각 tr 에서 날짜/종가/시가/고가/저가/거래량 뽑고, 하단 "맨뒤" 링크에서 lastPage 뽑음.
 DailyPricePage parseDailyPage(String html, int page) {
   final int? lastPage = _extractLastPage(html);
 
-  // <tr> ... </tr> 블록을 하나씩 잡아낸다.
   final RegExp trPattern = RegExp(
     r'<tr[^>]*>([\s\S]*?)</tr>',
     caseSensitive: false,
@@ -134,14 +118,13 @@ DailyPricePage parseDailyPage(String html, int page) {
 
   for (final RegExpMatch m in trPattern.allMatches(html)) {
     final String inner = m.group(1) ?? '';
-    // 빈 tr, colspan 뿐인 tr 제외
+    // 빈/헤더 행 skip
     if (inner.contains('colspan=')) continue;
 
     final RegExpMatch? dm = datePattern.firstMatch(inner);
     if (dm == null) continue;
 
-    // 이 tr 에 나타나는 tah p11 숫자들을 순서대로 뽑는다.
-    // 순서: 종가, 전일비(±)의 절대값, 시가, 고가, 저가, 거래량
+    // 숫자 순서: 종가, 전일비 절대값, 시가, 고가, 저가, 거래량
     final List<String> nums = numberInSpan
         .allMatches(inner)
         .map((RegExpMatch e) => e.group(1) ?? '')
@@ -181,7 +164,7 @@ DailyPricePage parseDailyPage(String html, int page) {
 }
 
 int? _extractLastPage(String html) {
-  // 예: <a href="/item/sise_day.naver?code=005930&amp;page=756"  >맨뒤
+  // <a href="...page=756">맨뒤 형태
   final RegExp lastPageInLink = RegExp(
     r'page=(\d+)[^>]*>[^<]*맨뒤',
     caseSensitive: false,

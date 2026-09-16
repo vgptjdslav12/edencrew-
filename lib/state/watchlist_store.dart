@@ -3,7 +3,6 @@ import 'package:flutter/foundation.dart';
 import '../data/models.dart';
 import '../data/stock_source.dart';
 
-/// 관심종목 정렬 기준.
 enum WatchlistSort { price, changeRate, name }
 
 extension WatchlistSortLabel on WatchlistSort {
@@ -19,15 +18,8 @@ extension WatchlistSortLabel on WatchlistSort {
   }
 }
 
-/// 관심종목 목록 + 각 종목의 시세/메타를 관리한다.
-///
-/// 이 저장소가 다음 세 화면에서 참조되는 단일 source of truth 다.
-/// - 관심 화면: 여기 있는 [symbols] 를 그대로 보여준다.
-/// - 검색 화면: [isFavorite] 로 별 아이콘 상태를 판정한다.
-/// - 상세 화면: 같은 [isFavorite] 를 참조 + [toggleFavorite] 로 등록/해제.
-///
-/// 시세와 메타는 관심 등록 시점에 lazy 로 채워지고, 새로고침 버튼을 누르면
-/// 관심종목 전체에 대해 한 번의 실시간 시세 요청으로 갱신한다.
+// 세 화면(관심/검색/상세)의 관심 상태 single source of truth.
+// 시세/메타는 등록 시점에 lazy hydrate, refresh() 로 일괄 갱신.
 class WatchlistStore extends ChangeNotifier {
   WatchlistStore({required StockSource source}) : _source = source;
 
@@ -51,7 +43,7 @@ class WatchlistStore extends ChangeNotifier {
   StockMeta? metaOf(String symbol) => _metas[symbol];
   Quote? quoteOf(String symbol) => _quotes[symbol];
 
-  /// 관심 등록/해제 토글. 등록될 때 true, 해제될 때 false 를 돌려준다.
+  // 등록되면 true, 해제되면 false.
   Future<bool> toggleFavorite(String symbol, {StockMeta? preloadedMeta}) async {
     if (_symbols.contains(symbol)) {
       _symbols.remove(symbol);
@@ -63,7 +55,7 @@ class WatchlistStore extends ChangeNotifier {
       _metas[symbol] = preloadedMeta;
     }
     notifyListeners();
-    // 새로 추가된 종목에 대한 메타/시세 채우기는 백그라운드로 진행.
+    // 메타/시세 채우기는 백그라운드로.
     _hydrate(symbol);
     return true;
   }
@@ -74,7 +66,7 @@ class WatchlistStore extends ChangeNotifier {
         _metas[symbol] = await _source.fetchMeta(symbol);
         notifyListeners();
       } catch (_) {
-        // 메타 실패 시 상세/목록에서 종목명 자리에 심볼만 노출됨. 무시.
+        // 메타 실패면 이름 자리에 심볼만 뜸. 그냥 넘김.
       }
     }
     try {
@@ -85,7 +77,7 @@ class WatchlistStore extends ChangeNotifier {
         notifyListeners();
       }
     } catch (_) {
-      // 시세 실패 시 스켈레톤 상태 유지.
+      // 실패면 스켈레톤 유지.
     }
   }
 
@@ -100,8 +92,7 @@ class WatchlistStore extends ChangeNotifier {
         ..clear()
         ..addAll(q);
     } catch (_) {
-      // 실패해도 화면이 죽지 않게. UI 쪽에서 별도 에러 처리 여지가 있지만
-      // 여기서는 조용히 넘어가고 이전 값을 유지한다.
+      // 실패해도 화면 죽지 않게 이전 값 유지. 에러 UI 는 안 띄움.
     } finally {
       _refreshing = false;
       notifyListeners();
@@ -114,11 +105,7 @@ class WatchlistStore extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// 정렬된 심볼 순서를 반환.
-  ///
-  /// 시세를 아직 받지 못한 종목은 currentPrice/changeRate 기준으로는 뒤에 몰아둔다.
-  /// (Figma 에 지정된 규칙이 없어 직접 판단한 부분. 시세가 없는 걸 상단에 두면
-  ///  같은 값끼리 순서가 흔들려 보이는 게 부자연스러워서 아래로 뺐음.)
+  // 시세 없는 종목은 현재가/등락률 정렬 시 뒤로 뺌 (직접 판단, README 기록).
   List<String> sortedSymbols() {
     final List<String> out = List<String>.from(_symbols);
     switch (_sort) {

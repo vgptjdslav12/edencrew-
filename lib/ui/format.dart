@@ -1,8 +1,8 @@
 import '../data/models.dart';
 
-/// 사람이 읽기 좋은 숫자 포맷 헬퍼.
+// 숫자 포맷 헬퍼.
 
-/// 정수/실수를 천 단위 구분자로 포맷. 소수부는 소수점 아래 자리수 만큼 유지.
+// 천 단위 구분자 붙임.
 String formatPrice(num v, {int fractionDigits = 0}) {
   final String sign = v < 0 ? '-' : '';
   final double abs = v.abs().toDouble();
@@ -21,14 +21,14 @@ String formatPrice(num v, {int fractionDigits = 0}) {
   return '$sign$result';
 }
 
-/// 등락액 문자열. 부호 포함. 상승 +400, 하락 -400, 보합 0.
+// 등락액. +400 / -400 / 0.
 String formatChangeAmount(num v) {
   if (v == 0) return '0';
   final String sign = v > 0 ? '+' : '-';
   return '$sign${formatPrice(v.abs())}';
 }
 
-/// 등락률 문자열. 부호 + 소수 둘째까지.
+// 등락률. 소수 둘째까지.
 String formatChangeRate(double rate) {
   final double pct = rate * 100;
   if (pct == 0) return '0.00%';
@@ -37,12 +37,9 @@ String formatChangeRate(double rate) {
   return '$sign$body%';
 }
 
-/// 시가총액을 조/억 단위로 축약. 예: 1,063조 / 29,113천.
-///
-/// 거래량과 시가총액 둘 다에 쓴다.
+// 조/억/천 단위 축약. 예: 1,063조 / 29,113천. 거래량·시가총액 둘 다.
 String formatAbbrevKor(num v) {
   if (v.abs() >= 1e12) {
-    // 조
     final num inTrillion = (v / 1e12);
     return '${formatPrice(inTrillion, fractionDigits: 0)}조';
   }
@@ -55,13 +52,13 @@ String formatAbbrevKor(num v) {
   return formatPrice(v);
 }
 
-/// `종목코드 · 시장` 표기.
+// 종목코드 · 시장.
 String formatCodeAndMarket(String symbol, String market) {
   if (market.isEmpty) return symbol;
   return '$symbol · $market';
 }
 
-/// 등락 방향을 아이콘 문자로 (▲ / ▼ / -).
+// 등락 방향 아이콘.
 String directionArrow(PriceDirection d) {
   switch (d) {
     case PriceDirection.up:

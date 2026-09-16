@@ -9,11 +9,7 @@ import 'widgets/empty_state.dart';
 import 'widgets/sort_sheet.dart';
 import 'widgets/watchlist_row.dart';
 
-/// 관심종목 목록 화면 (`01 · 관심`).
-///
-/// 상단: 타이틀 + 새로고침 버튼 + 정렬 칩.
-/// 목록: 정렬 기준으로 재배치되며, 각 행은 시세 로드 전에는 스켈레톤.
-/// 빈 상태: 관심종목이 없을 때 아이콘 + 안내.
+// 관심 화면 (01 · 관심).
 class WatchlistScreen extends StatelessWidget {
   const WatchlistScreen({super.key});
 

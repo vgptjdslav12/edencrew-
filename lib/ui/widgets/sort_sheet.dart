@@ -3,9 +3,7 @@ import 'package:flutter/material.dart';
 import '../../state/watchlist_store.dart';
 import '../../theme/theme.dart';
 
-/// 정렬 기준 바텀시트. 헤더 우측 칩을 눌렀을 때 열린다.
-///
-/// `showModalBottomSheet` 에 감싸서 쓴다.
+// 정렬 기준 바텀시트.
 Future<WatchlistSort?> showSortSheet(
   BuildContext context, {
   required WatchlistSort current,

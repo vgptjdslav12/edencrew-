@@ -4,20 +4,14 @@ import 'package:flutter/material.dart';
 
 import '../../theme/theme.dart';
 
-/// 검색 화면에서 관심 등록/해제 시 잠깐 뜨는 토스트.
-///
-/// 시안에 정의되지 않은 사항 (직접 판단 · README 에 기록):
-/// - 노출 시간: 1.8초. 사용자가 뭐라고 뜬 건지 읽을 수 있으면서 화면을 오래
-///   가리지 않도록 잡음.
-/// - 등장/퇴장 방식: 220ms fade + 4px 상방향 slide. 시안에 애니메이션 지정이
-///   없어서 감각적으로만.
+// 관심 등록/해제 시 잠깐 뜨는 토스트.
+// 시안 미지정: 1.8초 노출, 220ms fade + 4px slide (직접 판단, README).
 class FavoriteToast extends StatelessWidget {
   const FavoriteToast({
     super.key,
     required this.registered,
   });
 
-  /// true 이면 `관심이 등록되었습니다` + 채워진 별, false 면 반대.
   final bool registered;
 
   @override
@@ -57,9 +51,7 @@ class FavoriteToast extends StatelessWidget {
   }
 }
 
-/// 토스트를 화면 하단에 잠깐 띄우는 컨트롤러.
-///
-/// 검색 화면이 이 컨트롤러 하나를 갖고 있으면서, 별 아이콘 탭 시 `show(...)` 를 부른다.
+// 하단 토스트 컨트롤러. 화면이 하나 들고 있다가 별 탭 시 show().
 class ToastController extends ChangeNotifier {
   Widget? _current;
   Timer? _timer;
@@ -83,7 +75,7 @@ class ToastController extends ChangeNotifier {
   }
 }
 
-/// 화면 하단에 토스트를 fade/slide 로 얹어주는 위젯.
+// 하단에 fade/slide 로 토스트 얹는 위젯.
 class ToastOverlay extends StatelessWidget {
   const ToastOverlay({super.key, required this.controller, required this.child});
 

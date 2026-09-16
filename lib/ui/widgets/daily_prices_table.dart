@@ -4,12 +4,8 @@ import '../../data/models.dart';
 import '../../theme/theme.dart';
 import '../format.dart';
 
-/// 상세 화면 하단의 일별 시세 표.
-///
-/// 컬럼: 날짜(MM.DD) · 종가 · 등락 · 거래량.
-/// 등락은 이전 거래일 종가와 비교해서 부호/색을 붙인다. (일별 응답에 이미
-/// `전일비` 컬럼이 있지만, 파서 단순화를 위해 5개 숫자만 뽑아 두었다.
-/// 여기서 다시 이전 행의 종가로 diff 를 계산해 색을 준다.)
+// 일별 시세 표. 날짜(MM.DD)/종가/등락/거래량.
+// 등락은 이전 행 종가로 diff 재계산 (파서가 전일비 컬럼은 안 뽑았음).
 class DailyPricesTable extends StatelessWidget {
   const DailyPricesTable({super.key, required this.prices});
 

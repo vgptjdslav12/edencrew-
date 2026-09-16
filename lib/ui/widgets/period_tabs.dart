@@ -3,9 +3,7 @@ import 'package:flutter/material.dart';
 import '../../state/detail_store.dart';
 import '../../theme/theme.dart';
 
-/// `1개월` / `3개월` / `6개월` / `1년` 세그먼트.
-///
-/// 선택된 탭은 `accentDefault` 색과 `accentBg` 배경을 갖는다.
+// 1개월/3개월/6개월/1년 세그먼트.
 class PeriodTabs extends StatelessWidget {
   const PeriodTabs({
     super.key,

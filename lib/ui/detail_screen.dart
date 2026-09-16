@@ -12,7 +12,7 @@ import 'widgets/daily_prices_table.dart';
 import 'widgets/period_tabs.dart';
 import 'widgets/summary_card.dart';
 
-/// 종목 상세 화면 (`03 · 종목상세`).
+// 상세 화면 (03 · 종목상세).
 class DetailScreen extends StatefulWidget {
   const DetailScreen({
     super.key,

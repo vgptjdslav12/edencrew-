@@ -5,11 +5,7 @@ import 'package:flutter/foundation.dart';
 import '../data/models.dart';
 import '../data/stock_source.dart';
 
-/// 검색 화면 상태.
-///
-/// 관심 등록 여부는 여기서 관리하지 않는다. `WatchlistStore` 를 함께 구독해서
-/// 화면에서 판정한다. 이렇게 나눠 둔 이유는 한 종목의 관심 상태가 세 화면에서
-/// 어긋나지 않도록 하기 위함.
+// 검색 상태. 관심 여부는 WatchlistStore 를 화면에서 같이 구독해 판정.
 class SearchStore extends ChangeNotifier {
   SearchStore({required StockSource source}) : _source = source;
 
@@ -25,9 +21,7 @@ class SearchStore extends ChangeNotifier {
   List<SearchHit> get results => _results;
   bool get loading => _loading;
 
-  /// 사용자의 입력이 있을 때 호출.
-  ///
-  /// 200ms 디바운스 후 요청. 요청이 겹치면 마지막 요청 결과만 반영된다.
+  // 200ms 디바운스, 겹치면 마지막 요청 결과만 반영.
   void updateQuery(String next) {
     _query = next;
     _debounce?.cancel();

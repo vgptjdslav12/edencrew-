@@ -6,25 +6,17 @@ import 'package:http/http.dart' as http;
 import 'models.dart';
 import 'parsers.dart';
 
-/// 앱이 시세/종목 정보를 얻는 진입점.
-///
-/// 개발 중에는 `MockStockSource` 로, 실제 실행 시에는 `NaverStockSource` 로
-/// 바꿔 끼울 수 있게 abstract 로 두었다.
+// mock / naver 두 구현을 바꿔 끼우기 위한 인터페이스.
 abstract class StockSource {
   Future<List<SearchHit>> searchAutocomplete(String query);
-
-  /// 여러 심볼을 한 번의 요청으로 조회.
+  // 여러 심볼 한 번에.
   Future<Map<String, Quote>> fetchQuotes(List<String> symbols);
-
   Future<StockMeta> fetchMeta(String symbol);
-
-  /// 일별 시세 HTML 한 페이지.
+  // 일별 시세 HTML 한 페이지.
   Future<DailyPricePage> fetchDailyPage(String symbol, int page);
 }
 
-/// `assets/mock/` 에 담긴 응답 파일로만 동작하는 소스.
-///
-/// 네트워크 없이 UI/파싱 작업을 이어가기 위한 개발용.
+// assets/mock 만 읽는 개발용 소스.
 class MockStockSource implements StockSource {
   const MockStockSource();
 
@@ -35,8 +27,7 @@ class MockStockSource implements StockSource {
     final String trimmed = query.trim();
     if (trimmed.isEmpty) return const <SearchHit>[];
 
-    // 저장해둔 샘플 중에서 가장 그럴듯한 파일을 고른다.
-    // 완전 일치가 아니어도 부분 문자열이 있으면 그 파일을 쓴다.
+    // 검색어에서 골라 가장 근접한 mock 을 로드.
     final String path;
     if (trimmed.contains('삼성')) {
       path = '$_base/autocomplete_samsung.json';
@@ -69,7 +60,7 @@ class MockStockSource implements StockSource {
       final String text = await rootBundle.loadString(path);
       return parseMeta(text);
     } catch (_) {
-      // mock 에 없는 심볼은 이름을 심볼 자체로 채워 fallback.
+      // mock 에 없으면 이름 자리에 심볼만 채워 fallback.
       return StockMeta(symbol: symbol, name: symbol, marketKor: '');
     }
   }
@@ -81,19 +72,13 @@ class MockStockSource implements StockSource {
       final String text = await rootBundle.loadString(path);
       return parseDailyPage(text, page);
     } catch (_) {
-      // mock 에 없는 페이지는 lastPage 를 방금 요청한 페이지로 잡아
-      // 상세 화면이 이 시점부터 더 요청을 안 걸도록 유도.
+      // mock 없는 페이지는 lastPage 를 이전으로 잡아서 더 이상 요청 안 나가게.
       return DailyPricePage(page: page, prices: const <DailyPrice>[], lastPage: page - 1);
     }
   }
 }
 
-/// Naver 실제 endpoint 를 호출하는 소스.
-///
-/// 응답 캐릭터 인코딩:
-/// - 자동완성 / 메타데이터: UTF-8
-/// - 실시간 시세: EUC-KR (Content-Type 은 text/plain)
-/// - 일별 시세 HTML: EUC-KR
+// Naver endpoint 직접 호출. 자동완성/메타는 UTF-8, 실시간/일별 HTML 은 EUC-KR.
 class NaverStockSource implements StockSource {
   NaverStockSource({http.Client? client}) : _client = client ?? http.Client();
 
@@ -120,7 +105,7 @@ class NaverStockSource implements StockSource {
         .replace(queryParameters: <String, String>{'query': query});
     final http.Response resp = await _client.get(uri);
     _ensureOk(resp, uri);
-    // 실시간 응답은 Content-Type 이 text/plain;charset=EUC-KR
+    // Content-Type: text/plain;charset=EUC-KR
     final String text = _decodeEucKr(resp.bodyBytes);
     return parseRealtime(text);
   }
@@ -143,7 +128,7 @@ class NaverStockSource implements StockSource {
       'page': '$page',
     });
     final http.Response resp = await _client.get(uri, headers: const <String, String>{
-      // 일부 요청에서 UA 없이 오면 응답 형태가 달라질 수 있어 붙여둔다.
+      // UA 없으면 응답 다르게 오는 경우 있어 붙여둠.
       'User-Agent':
           'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
     });
@@ -160,13 +145,9 @@ class NaverStockSource implements StockSource {
     );
   }
 
-  /// Dart 기본 라이브러리에는 EUC-KR 디코더가 없다.
-  /// ASCII 영역은 그대로 두고, 128 이상은 CP949 mapping 이 없이는 정확 복원이
-  /// 어려우므로 UTF-8 fallback 을 시도한 뒤 실패하면 Latin1 로라도 되돌린다.
-  ///
-  /// 실전 앱이라면 charset_converter / kr_charset 같은 패키지를 붙였겠지만,
-  /// 이번 과제는 응답을 mock 으로 미리 UTF-8 로 재저장해 두었으므로
-  /// 이 함수는 실제 endpoint 를 직접 호출하는 경로에서만 쓰인다.
+  // Dart 표준에 EUC-KR 디코더가 없음. mock 은 이미 UTF-8 로 저장해뒀고
+  // 실 endpoint 호출 경로에서만 이 함수를 탐. 일단 UTF-8 로 시도, 실패면 Latin1 fallback.
+  // 제대로 하려면 charset_converter 같은 패키지 필요.
   String _decodeEucKr(List<int> bytes) {
     try {
       return utf8.decode(bytes);

@@ -1,9 +1,7 @@
 import 'package:meta/meta.dart';
 
-/// 상승/하락/보합.
 enum PriceDirection { up, down, flat }
 
-/// 검색 자동완성 결과 한 건.
 @immutable
 class SearchHit {
   const SearchHit({
@@ -12,16 +10,11 @@ class SearchHit {
     required this.market,
   });
 
-  /// 6자리 종목코드. 예: `005930`.
-  final String symbol;
-
-  /// 종목명. 예: `삼성전자`.
+  final String symbol; // 6자리 종목코드
   final String name;
+  final String market; // 예: 코스피
 
-  /// 시장 표기. 예: `코스피`.
-  final String market;
-
-  /// 앱 내부에서 종목을 식별하는 canonical id.
+  // 앱 내부 canonical id
   String get canonicalId => 'domestic:$symbol';
 
   @override
@@ -36,7 +29,6 @@ class SearchHit {
   int get hashCode => Object.hash(symbol, name, market);
 }
 
-/// 실시간 시세 한 건.
 @immutable
 class Quote {
   const Quote({
@@ -58,8 +50,7 @@ class Quote {
   final num low;
   final num accumulatedVolume;
 
-  /// 상장 주식 수. 시가총액 계산에 사용.
-  final num? listedShares;
+  final num? listedShares; // 시가총액 계산용
 
   num get changeAmount => currentPrice - previousClose;
 
@@ -75,14 +66,13 @@ class Quote {
     return PriceDirection.flat;
   }
 
-  /// 시가총액 = 현재가 × 상장 주식 수.
+  // 현재가 × 상장주식수
   num? get marketCap {
     if (listedShares == null) return null;
     return currentPrice * listedShares!;
   }
 }
 
-/// 종목 메타데이터.
 @immutable
 class StockMeta {
   const StockMeta({
@@ -93,12 +83,9 @@ class StockMeta {
 
   final String symbol;
   final String name;
-
-  /// 국내 거래소명 한글. 예: `코스피`.
-  final String marketKor;
+  final String marketKor; // 예: 코스피
 }
 
-/// 일별 시세 한 행.
 @immutable
 class DailyPrice {
   const DailyPrice({
@@ -118,7 +105,6 @@ class DailyPrice {
   final int volume;
 }
 
-/// 일별 시세 한 페이지.
 @immutable
 class DailyPricePage {
   const DailyPricePage({
@@ -129,7 +115,5 @@ class DailyPricePage {
 
   final int page;
   final List<DailyPrice> prices;
-
-  /// HTML 페이지네이션 하단 `맨뒤` 링크에서 뽑아낸 마지막 페이지 번호.
-  final int? lastPage;
+  final int? lastPage; // "맨뒤" 링크에서 뽑음. 없으면 null
 }

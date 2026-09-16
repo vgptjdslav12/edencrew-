@@ -3,14 +3,8 @@ import 'package:flutter/material.dart';
 import '../../data/models.dart';
 import '../../theme/theme.dart';
 
-/// 캔들 차트.
-///
-/// 시안의 렌더링 디테일(캔들 두께/간격, 축 눈금)까지 맞추기는 어려워서
-/// 요구사항의 필수 항목 — 상승/하락 색상, 위아래 요소 배치가 어긋나지 않는 정도 —
-/// 를 우선했다. `chartLineUp` / `chartLineDown` 만 사용.
-///
-/// 데이터는 최신이 리스트 앞쪽으로 오는 형태로 넘어온다. 화면상 오래된 캔들을
-/// 왼쪽에 두려고 그리기 순서를 뒤집는다.
+// 캔들 차트. 축 눈금/거래량 등은 스킵, 상승/하락 색과 위아래 배치만 지킴.
+// 데이터는 최신이 앞으로 옴 → 화면상 왼쪽=오래된 순서 되게 뒤집어 그림.
 class CandleChart extends StatelessWidget {
   const CandleChart({
     super.key,
@@ -69,7 +63,7 @@ class _CandlePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    // 최저가/최고가 계산.
+    // Y축 범위
     int minP = prices.first.lowPrice;
     int maxP = prices.first.highPrice;
     for (final DailyPrice p in prices) {
@@ -89,7 +83,7 @@ class _CandlePainter extends CustomPainter {
       return topPad + (1 - t) * plotH;
     }
 
-    // 오래된 → 최신 방향으로 그리기 위해 뒤집는다.
+    // 오래된 → 최신 순으로 그리려고 뒤집음
     final List<DailyPrice> ordered = prices.reversed.toList();
     final int n = ordered.length;
     final double slot = size.width / n;
